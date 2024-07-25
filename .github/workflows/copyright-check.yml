@@ -35,7 +35,7 @@ jobs:
       - name: Run copyright check on pull request
         if: github.event_name == 'pull_request'
         run: |
-          files=$(git diff --name-only origin/main | grep -E '^src/|^examples/' | tr '\n' ' ')
+          files=$(git diff --name-only origin/master | grep -E '^src/|^examples/' | tr '\n' ' ')
           if [ -n "$files" ]; then
             PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
           else

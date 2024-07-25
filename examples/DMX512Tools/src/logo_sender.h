@@ -1,9 +1,6 @@
-
-
 #pragma once
 
-static constexpr const uint8_t logo_sender_width = 48;
-
+static constexpr const uint8_t logo_sender_width  = 48;
 static constexpr const uint8_t logo_sender_height = 108;
 static constexpr const uint16_t logo_sender[]     = {
     0x0000u, 0x0000u, 0x0000u, 0x0000u, 0x0000u, 0x0000u, 0x0000u, 0x0000u,

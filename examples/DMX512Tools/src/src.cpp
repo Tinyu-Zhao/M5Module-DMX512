@@ -1,5 +1,3 @@
-
-
 #include "common.h"
 #include "view_receiver.h"
 #include "view_sender.h"
