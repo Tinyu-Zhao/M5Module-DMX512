@@ -23,11 +23,6 @@ void setup(void) {
     dmx_config_t dmxConfig = DMX_DEFAULT_CONFIG;
     dmx_param_config(dmxPort, &dmxConfig);
 
-    /// For M5Stack Core2/Tough pin setting: TX:19  RX:35  EN:27
-    gpio_num_t transmitPin = GPIO_NUM_19;
-    gpio_num_t receivePin  = GPIO_NUM_35;
-    gpio_num_t enablePin   = GPIO_NUM_27;
-
     if (M5.getBoard() == m5::board_t::board_M5Stack) {
         /// M5Stack(BASIC/GRAY/GO/FIRE) pin setting: TX:13  RX:35  EN:12
         transmitPin = GPIO_NUM_13;

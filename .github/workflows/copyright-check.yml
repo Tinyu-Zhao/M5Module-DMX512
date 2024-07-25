@@ -52,12 +52,17 @@ jobs:
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
       - name: Check files in 'src' directory
+        id: check_src
         run: |
           if [ -d "src" ]; then
             files=$(find src \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
             echo "Files in 'src' to check: $files"
             if [ -n "$files" ]; then
               PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+              if [ $? -ne 0 ]; then
+                echo "Files in 'src' need copyright notices."
+                echo "$files" > changed_files.txt
+              fi
             else
               echo "No files found in 'src' to check."
             fi
@@ -66,15 +71,29 @@ jobs:
           fi
 
       - name: Check files in 'examples' directory
+        id: check_examples
         run: |
           if [ -d "examples" ]; then
             files=$(find examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
             echo "Files in 'examples' to check: $files"
             if [ -n "$files" ]; then
               PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+              if [ $? -ne 0 ]; then
+                echo "Files in 'examples' need copyright notices."
+                echo "$files" >> changed_files.txt
+              fi
             else
               echo "No files found in 'examples' to check."
             fi
           else
             echo "'examples' directory does not exist."
           fi
+
+      - name: Commit changes
+        if: steps.check_src.outputs.changed_files || steps.check_examples.outputs.changed_files
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Add missing copyright notices"
+          git push
