@@ -51,13 +51,30 @@ jobs:
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
-      - name: Check all files
+      - name: Check files in 'src' directory
         run: |
-          # List all files in the specified directories with specific extensions
-          files=$(find src examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
-          echo "Files to check: $files"
-          if [ -n "$files" ]; then
-            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+          if [ -d "src" ]; then
+            files=$(find src \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
+            echo "Files in 'src' to check: $files"
+            if [ -n "$files" ]; then
+              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+            else
+              echo "No files found in 'src' to check."
+            fi
           else
-            echo "No files found to check."
+            echo "'src' directory does not exist."
+          fi
+
+      - name: Check files in 'examples' directory
+        run: |
+          if [ -d "examples" ]; then
+            files=$(find examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
+            echo "Files in 'examples' to check: $files"
+            if [ -n "$files" ]; then
+              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+            else
+              echo "No files found in 'examples' to check."
+            fi
+          else
+            echo "'examples' directory does not exist."
           fi

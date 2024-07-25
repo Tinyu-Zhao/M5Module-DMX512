@@ -18,8 +18,6 @@ static view_receiver_t view_receiver;
 static view_sender_t view_sender;
 
 void setup(void) {
-    M5.begin();
-
     /* Configure the DMX hardware to the default DMX settings and tell the DMX
       driver which hardware pins we are using. */
     dmx_config_t dmxConfig = DMX_DEFAULT_CONFIG;
