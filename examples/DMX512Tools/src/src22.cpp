@@ -19,9 +19,6 @@ void setup(void) {
 
     dmx_set_pin(dmxPort, transmitPin, receivePin, enablePin);
 
-    dmx_driver_install(dmxPort, DMX_MAX_PACKET_SIZE, dmxQueueSize, &queue,
-                       dmxInterruptPriority);
-
     drawSelectSetup();
 }
 

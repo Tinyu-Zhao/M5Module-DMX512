@@ -64,6 +64,8 @@ jobs:
 
       - name: Commit changes if any
         id: commit_changes
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           if git diff --exit-code; then
             echo "No changes to commit."
