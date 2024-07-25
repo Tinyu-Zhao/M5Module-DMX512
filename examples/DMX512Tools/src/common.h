@@ -6,6 +6,7 @@
 #if defined(DMX_PACKET_TIMEOUT_TICK)
 #define ESP_DMX_VERSION 2
 #else
+
 #define ESP_DMX_VERSION 1
 #endif
 

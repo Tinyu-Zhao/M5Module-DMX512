@@ -1,5 +1,9 @@
 name: Copyright Check
 
+permissions:
+  contents: write  # 允许写入仓库内容
+
+
 on:
   pull_request:
     paths:
