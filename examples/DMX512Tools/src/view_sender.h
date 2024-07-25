@@ -15,6 +15,7 @@ class view_sender_t : public view_t {
         dmx_write_packet(dmxPort, data[0], DMX_MAX_PACKET_SIZE);
 
         M5.Display.setFont(&fonts::Font0);
+
         M5.Display.setTextDatum(textdatum_t::top_left);
         M5.Display.setTextWrap(false);
         M5.Display.fillScreen(TFT_BLACK);
@@ -273,15 +274,13 @@ class view_sender_t : public view_t {
         if (scroll_y > new_y) {
             scroll_y_add = 0;
             int target   = scroll_y - new_y;
-            while (0 < (target += --scroll_y_add))
-                ;
+            while (0 < (target += --scroll_y_add));
             return true;
         } else if (scroll_y + scroll_height - channel_item_height < new_y) {
             scroll_y_add = 0;
             int target =
                 new_y - (scroll_y + scroll_height - channel_item_height);
-            while (0 < (target -= ++scroll_y_add))
-                ;
+            while (0 < (target -= ++scroll_y_add));
             return true;
         }
         return false;

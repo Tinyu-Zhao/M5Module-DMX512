@@ -6,6 +6,7 @@ class view_receiver_t : public view_t {
    public:
     void setup(void) override {
 #if ESP_DMX_VERSION == 1
+
         dmx_set_mode(dmxPort, DMX_MODE_RX);
 #else
         dmx_set_mode(dmxPort, DMX_MODE_READ);

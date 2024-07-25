@@ -1,8 +1,4 @@
-/*
- * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
- *
- * SPDX-License-Identifier: MIT
- */
+
 
 #include "common.h"
 #include "view_receiver.h"
@@ -14,6 +10,7 @@ enum scene_mode_t {
     mode_select,
     mode_receiver,
     mode_sender,
+
 };
 
 static scene_mode_t scene_mode = mode_select;
