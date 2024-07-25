@@ -21,6 +21,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debugging information
+        run: |
+          echo "Current SHA: $GITHUB_SHA"
+          echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
+          echo "Recent commits:"
+          git log --oneline -n 10
+          echo "Files detected:"
+          git diff-tree --no-commit-id --name-only -r $GITHUB_SHA
+          files=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep -E '^src/|^examples/' | tr '\n' ' ')
+          echo "Files to check: $files"
+
       - name: Download copyright check script
         run: |
           curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/check_copyright.py
@@ -34,14 +45,6 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
-
-      - name: Debugging information
-        run: |
-          echo "Current SHA: $GITHUB_SHA"
-          echo "Files detected:"
-          git diff-tree --no-commit-id --name-only -r $GITHUB_SHA
-          files=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep -E '^src/|^examples/' | tr '\n' ' ')
-          echo "Files to check: $files"
 
       - name: Run copyright check
         if: github.event_name == 'push'
