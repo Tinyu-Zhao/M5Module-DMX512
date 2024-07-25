@@ -37,6 +37,19 @@ jobs:
           echo "Commits in SHA:"
           git log $GITHUB_SHA --oneline
 
+      - name: Debug GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          gh auth login
+          gh auth status
+          gh config list
+
+      - name: Authenticate GitHub CLI
+        run: gh auth status
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
       - name: Download copyright check script
         run: |
           curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/check_copyright.py
@@ -64,6 +77,8 @@ jobs:
 
       - name: Commit changes if any
         id: commit_changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if git diff --exit-code; then
             echo "No changes to commit."
