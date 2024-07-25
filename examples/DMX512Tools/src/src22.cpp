@@ -17,22 +17,6 @@ static ui_button_t btns[2]     = {{0, 200, 120, 40, "Receiver"},
 static view_receiver_t view_receiver;
 static view_sender_t view_sender;
 
-void drawSelectSetup(void) {
-    scene_mode = mode_select;
-    M5.Display.fillScreen(TFT_BLACK);
-    M5.Display.setTextDatum(textdatum_t::baseline_center);
-    M5.Display.setFont(&fonts::Font4);
-    M5.Display.drawString("DMX512Tools", M5.Display.width() >> 1,
-                          M5.Display.height() >> 2);
-
-    M5.Display.setFont(&fonts::AsciiFont8x16);
-    M5.Display.drawString("Select mode", M5.Display.width() >> 1,
-                          M5.Display.height() * 12 >> 4);
-    for (size_t i = 0; i < 2; ++i) {
-        btns[i].draw(&M5.Display, false, false, true);
-    }
-}
-
 void setup(void) {
     M5.begin();
 
