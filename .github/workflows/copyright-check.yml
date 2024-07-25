@@ -1,0 +1,53 @@
+name: Copyright Check
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'examples/**'
+  push:
+    paths:
+      - 'src/**'
+      - 'examples/**'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download copyright check script
+        run: |
+          curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/check_copyright.py
+
+      - name: Download setup script
+        run: |
+          curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/setup.py
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install --user setuptools
+          PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
+
+      - name: Run copyright check on pull request
+        if: github.event_name == 'pull_request'
+        run: |
+          files=$(git diff --name-only origin/main | grep -E '^src/|^examples/' | tr '\n' ' ')
+          if [ -n "$files" ]; then
+            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+          else
+            echo "No relevant files changed."
+          fi
+
+      - name: Run copyright check on push
+        if: github.event_name == 'push'
+        run: |
+          files=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep -E '^src/|^examples/' | tr '\n' ' ')
+          if [ -n "$files" ]; then
+            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+          else
+            echo "No relevant files changed."
+          fi

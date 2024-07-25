@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: 2024 M5Stack Technology CO LTD
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 
 /// M5ライブラリは M5Stack.hやM5Core2.hを使用しても良いが、
@@ -79,19 +84,17 @@ void setup(void) {
 }
 
 void loop(void) {
-
     dmx_event_t packet;
 
     /// RX側からDMXデータを受信する。
     if (xQueueReceive(dmxRxQueue, &packet, DMX_RX_PACKET_TOUT_TICK)) {
         if (packet.status == DMX_OK) {
-            if (ESP_OK ==
-                dmx_read_packet(dmxRxPort, in_data, packet.size)) {
-
-// このサンプルでは memcpyを使って、入力内容をそのまま出力内容にコピーする。
+            if (ESP_OK == dmx_read_packet(dmxRxPort, in_data, packet.size)) {
+                // このサンプルでは
+                // memcpyを使って、入力内容をそのまま出力内容にコピーする。
                 memcpy(out_data, in_data, DMX_MAX_PACKET_SIZE);
-// ※ ここで値を変更したり、MIDI等から信号をミックスすることができる。
-
+                // ※
+                // ここで値を変更したり、MIDI等から信号をミックスすることができる。
             }
         }
     }
@@ -100,11 +103,13 @@ void loop(void) {
     dmx_write_packet(dmxTxPort, out_data, DMX_MAX_PACKET_SIZE);
 
 #if ESP_DMX_VERSION == 1
-    if (ESP_ERR_TIMEOUT != dmx_wait_tx_done(dmxTxPort, DMX_TX_PACKET_TOUT_TICK)) {
+    if (ESP_ERR_TIMEOUT !=
+        dmx_wait_tx_done(dmxTxPort, DMX_TX_PACKET_TOUT_TICK)) {
         dmx_tx_packet(dmxTxPort);
     }
 #else
-    if (ESP_ERR_TIMEOUT != dmx_wait_send_done(dmxTxPort, DMX_TX_PACKET_TOUT_TICK)) {
+    if (ESP_ERR_TIMEOUT !=
+        dmx_wait_send_done(dmxTxPort, DMX_TX_PACKET_TOUT_TICK)) {
         dmx_send_packet(dmxTxPort, DMX_MAX_PACKET_SIZE);
     }
 #endif
