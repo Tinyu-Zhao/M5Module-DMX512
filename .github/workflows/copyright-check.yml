@@ -1,8 +1,7 @@
 name: Copyright Check
 
 permissions:
-  contents: write  # 允许写入仓库内容
-
+  contents: write
 
 on:
   pull_request:
@@ -36,17 +35,15 @@ jobs:
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
-      - name: Run copyright check on pull request
-        if: github.event_name == 'pull_request'
+      - name: Debugging information
         run: |
-          files=$(git diff --name-only origin/master | grep -E '^src/|^examples/' | tr '\n' ' ')
-          if [ -n "$files" ]; then
-            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-          else
-            echo "No relevant files changed."
-          fi
+          echo "Current SHA: $GITHUB_SHA"
+          echo "Files detected:"
+          git diff-tree --no-commit-id --name-only -r $GITHUB_SHA
+          files=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep -E '^src/|^examples/' | tr '\n' ' ')
+          echo "Files to check: $files"
 
-      - name: Run copyright check on push
+      - name: Run copyright check
         if: github.event_name == 'push'
         run: |
           files=$(git diff-tree --no-commit-id --name-only -r $GITHUB_SHA | grep -E '^src/|^examples/' | tr '\n' ' ')
