@@ -11,12 +11,6 @@ enum scene_mode_t {
 
 };
 
-static scene_mode_t scene_mode = mode_select;
-static ui_button_t btns[2]     = {{0, 200, 120, 40, "Receiver"},
-                                  {200, 200, 120, 40, "Sender"}};
-static view_receiver_t view_receiver;
-static view_sender_t view_sender;
-
 void setup(void) {
     /* Configure the DMX hardware to the default DMX settings and tell the DMX
       driver which hardware pins we are using. */
