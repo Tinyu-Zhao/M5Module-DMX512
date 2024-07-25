@@ -51,49 +51,39 @@ jobs:
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
-      - name: Check files in 'src' directory
-        id: check_src
+      - name: Check all files
         run: |
-          if [ -d "src" ]; then
-            files=$(find src \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
-            echo "Files in 'src' to check: $files"
-            if [ -n "$files" ]; then
-              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-              if [ $? -ne 0 ]; then
-                echo "Files in 'src' need copyright notices."
-                echo "$files" > changed_files.txt
-              fi
-            else
-              echo "No files found in 'src' to check."
-            fi
+          # List all files in the specified directories with specific extensions
+          files=$(find src examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
+          echo "Files to check: $files"
+          if [ -n "$files" ]; then
+            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
           else
-            echo "'src' directory does not exist."
+            echo "No files found to check."
           fi
 
-      - name: Check files in 'examples' directory
-        id: check_examples
+      - name: Commit changes if any
+        id: commit_changes
         run: |
-          if [ -d "examples" ]; then
-            files=$(find examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
-            echo "Files in 'examples' to check: $files"
-            if [ -n "$files" ]; then
-              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-              if [ $? -ne 0 ]; then
-                echo "Files in 'examples' need copyright notices."
-                echo "$files" >> changed_files.txt
-              fi
-            else
-              echo "No files found in 'examples' to check."
-            fi
+          if git diff --exit-code; then
+            echo "No changes to commit."
+            echo "status=unchanged" >> $GITHUB_ENV
           else
-            echo "'examples' directory does not exist."
+            echo "Changes detected, creating a new branch and PR..."
+            
+            # Create a new branch
+            git checkout -b copyright-update-${{ github.run_id }}
+            
+            git config --global user.name "github-actions"
+            git config --global user.email "actions@github.com"
+            git add .
+            git commit -m "Add copyright notices"
+            
+            # Push to the new branch
+            git push --set-upstream origin copyright-update-${{ github.run_id }}
+            
+            # Create a pull request using GitHub CLI
+            gh pr create --title "Add copyright notices" --body "This PR includes copyright notices for updated files." --base master --head copyright-update-${{ github.run_id }}
+            
+            echo "status=modified" >> $GITHUB_ENV
           fi
-
-      - name: Commit changes
-        if: steps.check_src.outputs.changed_files || steps.check_examples.outputs.changed_files
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Add missing copyright notices"
-          git push

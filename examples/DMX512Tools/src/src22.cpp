@@ -17,12 +17,6 @@ void setup(void) {
     dmx_config_t dmxConfig = DMX_DEFAULT_CONFIG;
     dmx_param_config(dmxPort, &dmxConfig);
 
-    if (M5.getBoard() == m5::board_t::board_M5Stack) {
-        /// M5Stack(BASIC/GRAY/GO/FIRE) pin setting: TX:13  RX:35  EN:12
-        transmitPin = GPIO_NUM_13;
-        receivePin  = GPIO_NUM_35;
-        enablePin   = GPIO_NUM_12;
-    }
     dmx_set_pin(dmxPort, transmitPin, receivePin, enablePin);
 
     dmx_driver_install(dmxPort, DMX_MAX_PACKET_SIZE, dmxQueueSize, &queue,

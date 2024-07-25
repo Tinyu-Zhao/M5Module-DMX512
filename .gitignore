@@ -31,3 +31,9 @@
 *.out
 *.app
 /examples/DMX512Tools/.vscode
+
+build/
+dist/
+check_copyright.egg-info/
+check_copyright.py
+setup.py
