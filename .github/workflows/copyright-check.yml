@@ -37,22 +37,6 @@ jobs:
           echo "Commits in SHA:"
           git log $GITHUB_SHA --oneline
 
-      - name: Use HEAD for push event
-        if: github.event_name == 'push'
-        run: |
-          files=$(git diff-tree --no-commit-id --name-only -r HEAD | grep -E '^src/|^examples/' | tr '\n' ' ')
-          echo "Files to check: $files"
-          if [ -n "$files" ]; then
-            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-          else
-            echo "No relevant files changed."
-          fi
-
-      - name: Compare commits
-        run: |
-          echo "Diff between master and SHA:"
-          git diff --name-only origin/master $GITHUB_SHA
-
       - name: Download copyright check script
         run: |
           curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/check_copyright.py
@@ -67,13 +51,13 @@ jobs:
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
-      - name: Run copyright check
-        if: github.event_name == 'push'
+      - name: Check all files
         run: |
-          files=$(git diff-tree --no-commit-id --name-only -r HEAD | grep -E '^src/|^examples/' | tr '\n' ' ')
+          # List all files in the specified directories with specific extensions
+          files=$(find src examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
           echo "Files to check: $files"
           if [ -n "$files" ]; then
             PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
           else
-            echo "No relevant files changed."
+            echo "No files found to check."
           fi
