@@ -8,6 +8,7 @@
 #else
 
 #define ESP_DMX_VERSION 1
+
 #endif
 
 /* lets decide which DMX port to use. The ESP32 has either 2 or 3 ports.
