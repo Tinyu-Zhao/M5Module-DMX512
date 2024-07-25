@@ -1,8 +1,5 @@
 name: Copyright Check
 
-permissions:
-  contents: write
-
 on:
   pull_request:
     paths:
@@ -29,14 +26,6 @@ jobs:
           echo "Recent commits:"
           git log --oneline -n 10
 
-      - name: Check for changes
-        run: |
-          git fetch origin master
-          echo "Commits in master:"
-          git log origin/master --oneline
-          echo "Commits in SHA:"
-          git log $GITHUB_SHA --oneline
-
       - name: Download copyright check script
         run: |
           curl -O https://raw.githubusercontent.com/Tinyu-Zhao/check-copyright/master/check_copyright.py
@@ -51,49 +40,44 @@ jobs:
           pip install --user setuptools
           PYTHONUSERBASE=$HOME/.local python3 setup.py install --user
 
-      - name: Check files in 'src' directory
-        id: check_src
+      - name: Check all files
+        id: copyright_check
         run: |
-          if [ -d "src" ]; then
-            files=$(find src \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
-            echo "Files in 'src' to check: $files"
-            if [ -n "$files" ]; then
-              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-              if [ $? -ne 0 ]; then
-                echo "Files in 'src' need copyright notices."
-                echo "$files" > changed_files.txt
-              fi
-            else
-              echo "No files found in 'src' to check."
-            fi
+          files=$(find src examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
+          echo "Files to check: $files"
+          if [ -n "$files" ]; then
+            PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
+            echo "result=modified" >> $GITHUB_ENV
           else
-            echo "'src' directory does not exist."
+            echo "No files found to check."
+            echo "result=unchanged" >> $GITHUB_ENV
           fi
 
-      - name: Check files in 'examples' directory
-        id: check_examples
+      - name: Commit changes if any
+        id: commit_changes
         run: |
-          if [ -d "examples" ]; then
-            files=$(find examples \( -name "*.ino" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" \) | tr '\n' ' ')
-            echo "Files in 'examples' to check: $files"
-            if [ -n "$files" ]; then
-              PYTHONPATH="${HOME}/.local/lib/python3.*/site-packages" python3 check_copyright.py $files
-              if [ $? -ne 0 ]; then
-                echo "Files in 'examples' need copyright notices."
-                echo "$files" >> changed_files.txt
-              fi
-            else
-              echo "No files found in 'examples' to check."
-            fi
+          if [ "$result" = "modified" ]; then
+            git config --global user.name "github-actions"
+            git config --global user.email "actions@github.com"
+
+            # Create a new branch
+            BRANCH_NAME="update-copyright-notices"
+            git checkout -b $BRANCH_NAME
+
+            git add .
+            git commit -m "Add copyright notices"
+
+            # Push the branch
+            git push origin $BRANCH_NAME
           else
-            echo "'examples' directory does not exist."
+            echo "No changes to commit."
           fi
 
-      - name: Commit changes
-        if: steps.check_src.outputs.changed_files || steps.check_examples.outputs.changed_files
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Add missing copyright notices"
-          git push
+      - name: Create a Pull Request
+        if: steps.commit_changes.outputs.result == 'modified'
+        uses: peter-evans/create-pull-request@v4
+        with:
+          title: "Add copyright notices"
+          body: "This PR adds missing copyright notices to the source files."
+          base: master
+          head: $BRANCH_NAME
