@@ -6,7 +6,6 @@ QueueHandle_t queue;
 
 enum scene_mode_t {
     mode_select,
-    mode_receiver,
     mode_sender,
 
 };
