@@ -6,7 +6,9 @@
 #if defined(DMX_PACKET_TIMEOUT_TICK)
 #define ESP_DMX_VERSION 2
 #else
+
 #define ESP_DMX_VERSION 1
+
 #endif
 
 /* lets decide which DMX port to use. The ESP32 has either 2 or 3 ports.
@@ -26,6 +28,7 @@ struct ui_rect_t {
     int x = 0;
     int y = 0;
     int w = 0;
+
     int h = 0;
     ui_rect_t(int src_x, int src_y, int src_w, int src_h)
         : x{src_x}, y{src_y}, w{src_w}, h{src_h} {};

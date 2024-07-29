@@ -1,5 +1,4 @@
 #pragma once
-
 #include "common.h"
 
 class view_receiver_t : public view_t {

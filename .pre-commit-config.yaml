@@ -1,0 +1,9 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+
+repos:
+  - repo: https://github.com/Tinyu-Zhao/check-copyright/
+    rev: v0.0.1
+    hooks:
+      - id: check-copyright
+        args: ['--config', 'check_copyright_config.yaml']
